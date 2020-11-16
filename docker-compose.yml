@@ -1,0 +1,54 @@
+version: "3"
+services:
+  poll:
+    build: ./poll
+    ports:
+      - "5000:80"
+    networks: 
+      - poll-tier
+    depends_on:
+      - redis
+    restart: always
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    networks: 
+      - poll-tier
+      - back-tier
+    restart: always
+  worker:
+    build: ./worker
+    command: java -jar worker-jar-with-dependencies.jar
+    depends_on:
+      - redis
+    restart: always
+  db:
+    image: postgres
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/initdb.sql
+    ports:
+      - "5432:5432"
+    networks: 
+      - result-tier
+      - back-tier
+    restart: always
+  result:
+    build: ./result
+    ports:
+      - "5001:80"
+    networks:
+      - result-tier
+    restart: always
+volumes:
+    db-data:
+        external: true
+networks:
+  poll-tier: 
+  result-tier:  
+  back-tier:
