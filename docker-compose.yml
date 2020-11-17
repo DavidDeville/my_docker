@@ -6,6 +6,8 @@ services:
       - "5000:80"
     networks: 
       - poll-tier
+    links: 
+      - redis
     depends_on:
       - redis
     restart: always
@@ -24,8 +26,12 @@ services:
   worker:
     build: ./worker
     command: java -jar worker-jar-with-dependencies.jar
+    links:
+      - redis
     depends_on:
       - redis
+    networks: 
+      - back-tier
     restart: always
   db:
     image: postgres:11
@@ -35,7 +41,7 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - db-data:/var/lib/postgresql/data
-      - "./schema.sql:/docker-entrypoint-initdb.d/schema.sql"
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     ports:
       - "5432:5432"
     networks: 
