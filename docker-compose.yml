@@ -10,13 +10,16 @@ services:
       - redis
     restart: always
   redis:
-    image: redis
+    image: redis:alpine
     hostname: redis
+    volumes:
+    - ./config/redis.conf:/redis.conf
     ports:
       - "6379:6379"
     networks: 
       - poll-tier
       - back-tier
+    command: [ "redis-server", "/redis.conf" ]
     restart: always
   worker:
     build: ./worker
@@ -25,13 +28,14 @@ services:
       - redis
     restart: always
   db:
-    image: postgres
+    image: postgres:11
     environment: 
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - "./schema.sql:/docker-entrypoint-initdb.d/schema.sql"
     ports:
       - "5432:5432"
     networks: 
@@ -47,7 +51,6 @@ services:
     restart: always
 volumes:
     db-data:
-        external: true
 networks:
   poll-tier: 
   result-tier:  
