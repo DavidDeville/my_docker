@@ -2,7 +2,7 @@ FROM maven:3.5-jdk-8-alpine as builder
 
 WORKDIR /worker
 
-COPY . .
+COPY . /worker
 
 RUN mvn dependency:resolve
 

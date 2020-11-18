@@ -1,8 +1,8 @@
 FROM python
 
-WORKDIR /poll-app/poll
+WORKDIR /poll
 
-COPY . .
+COPY . /poll
 
 RUN pip3 install -r requirements.txt
 

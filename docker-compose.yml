@@ -57,6 +57,7 @@ services:
     restart: always
 volumes:
     db-data:
+      external: false
 networks:
   poll-tier: 
   result-tier:  
